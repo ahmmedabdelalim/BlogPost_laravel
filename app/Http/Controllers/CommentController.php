@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NewComment;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Traits\GeneralTraits;
+use App\Models\Post;
+use App\Notifications\NotifyOwner;
 
 class CommentController extends Controller
 {
@@ -19,6 +22,9 @@ class CommentController extends Controller
             'user_id'=>$request->user_id,
             'post_id'=>$request->post_id,
         ]);
+        broadcast(new NewComment($comment->user , $comment))->toOthers();
+
+
         return response()->json([
             'id'=>$comment->id,
             'body'=>$comment->body,
